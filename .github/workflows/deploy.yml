@@ -30,7 +30,7 @@ jobs:
         key: ${{ secrets.SSHKEY }}
         port: ${{ secrets.PORT }}
         script: |
-          cd /var/html/apieleicoes.projectdev.services/html
+          cd /var/www/apieleicoes.projectdev.services/html
           npm run build
           pm2 start app.js 
           
