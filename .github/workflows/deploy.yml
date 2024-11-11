@@ -15,20 +15,20 @@ jobs:
     - name: Copy repository contents via scp
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.ORGHOST }}
-        username: ${{ secrets.ORGUSERNAME }}
-        key: ${{ secrets.ORGSSHKEY }}
-        port: ${{ secrets.ORGPORT}}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        port: ${{ secrets.PORT}}
         source: '.'
         target: "/var/www/apieleicoes.projectdev.services/html"
 
     - name: Executing remote command
       uses: appleboy/ssh-action@v1.1.0
       with:
-        host: ${{ secrets.ORGHOST }}
-        username: ${{ secrets.ORGUSERNAME }}
-        key: ${{ secrets.ORGSSHKEY }}
-        port: ${{ secrets.ORGPORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        port: ${{ secrets.PORT }}
         script: |
           cd /var/html/apieleicoes.projectdev.services/html
           npm run build
