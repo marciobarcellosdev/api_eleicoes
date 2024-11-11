@@ -1,0 +1,36 @@
+name: Deploy-Nodejs-Api-Eleicoes
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Copy repository contents via scp
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.ORGHOST }}
+        username: ${{ secrets.ORGUSERNAME }}
+        key: ${{ secrets.ORGSSHKEY }}
+        port: ${{ secrets.ORGPORT}}
+        source: '.'
+        target: "/var/www/apieleicoes.projectdev.services/html"
+
+    - name: Executing remote command
+      uses: appleboy/ssh-action@v1.1.0
+      with:
+        host: ${{ secrets.ORGHOST }}
+        username: ${{ secrets.ORGUSERNAME }}
+        key: ${{ secrets.ORGSSHKEY }}
+        port: ${{ secrets.ORGPORT }}
+        script: |
+          cd /var/html/apieleicoes.projectdev.services/html
+          npm run build
+          pm2 start app.js 
+          
