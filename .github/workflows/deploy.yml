@@ -22,16 +22,16 @@ jobs:
         source: '.'
         target: "/var/www/apieleicoes.projectdev.services/html"
 
-    - name: Executing remote command
-      uses: appleboy/ssh-action@v1.1.0
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSHKEY }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/apieleicoes.projectdev.services/html
-          pm2 restart app
+    # - name: Executing remote command
+    #   uses: appleboy/ssh-action@v1.1.0
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.SSHKEY }}
+    #     port: ${{ secrets.PORT }}
+    # - name: aux
+    #   working-directory: ./var/www/apieleicoes.projectdev.services/html
+    #   run: pm2 restart app
 
 
           
