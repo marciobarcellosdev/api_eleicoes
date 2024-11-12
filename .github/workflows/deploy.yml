@@ -1,4 +1,8 @@
 name: Deploy-Nodejs-Api-Eleicoes
+
+env:
+  RELEASE_PATH: /var/www/apieleicoes.projectdev.services/html
+
 on: [push]
 jobs:
   build:
@@ -20,7 +24,7 @@ jobs:
         key: ${{ secrets.SSHKEY }}
         port: ${{ secrets.PORT}}
         source: '.'
-        target: "/var/www/apieleicoes.projectdev.services/html"
+        target: ${{ env.RELEASE_PATH }}
 
     - name: EXECUTING_REMOTE_COMMAND
       uses: appleboy/ssh-action@v1.1.0
@@ -29,8 +33,8 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/apieleicoes.projectdev.services/html
-          /root/.local/share/fnm/node-versions/v22.11.0/installation/bin/pm2 restart app 
+        run: |
+          cd ${{ env.RELEASE_PATH }}
+          pm2 restart app 
 
           
