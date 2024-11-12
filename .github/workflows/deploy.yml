@@ -29,10 +29,17 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/apieleicoes.projectdev.services/html
-          export NVM_DIR=~/.nvm
-          source ~/.nvm/nvm.sh 
-          npm run build
-          pm2 start app.js 
+        # script: |
+        #   cd /var/www/apieleicoes.projectdev.services/html
+        #   export NVM_DIR=~/.nvm
+        #   source ~/.nvm/nvm.sh 
+        #   npm run build
+        #   pm2 start app.js 
+    - name: aux
+      working-directory: /var/www/apieleicoes.projectdev.services/html
+      run: |
+        npm run build
+        pm2 start app.js  
+
+
           
