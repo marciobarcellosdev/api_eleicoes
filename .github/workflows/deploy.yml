@@ -35,6 +35,7 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           cd ${{ env.RELEASE_PATH }}
-          sudo pm2 restart app 
+          export PATH=$PATH:/root/.local/share/fnm/node-versions/v22.11.0/installation/bin
+          pm2 restart app 
 
           
