@@ -33,7 +33,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         port: ${{ secrets.PORT }}
-        run: |
+        script: |
           cd ${{ env.RELEASE_PATH }}
           pm2 restart app 
 
