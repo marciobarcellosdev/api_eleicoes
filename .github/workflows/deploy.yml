@@ -35,6 +35,6 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           cd ${{ env.RELEASE_PATH }}
-          pm2 restart app 
+          sudo pm2 restart app 
 
           
