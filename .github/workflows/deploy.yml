@@ -31,6 +31,8 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           cd /var/www/apieleicoes.projectdev.services/html
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh 
           npm run build
           pm2 start app.js 
           
