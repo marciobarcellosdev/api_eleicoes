@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Copy repository contents via scp
+    - name: COPY_REPOSITORY_DATA_VIA_SCP
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.HOST }}
@@ -22,16 +22,15 @@ jobs:
         source: '.'
         target: "/var/www/apieleicoes.projectdev.services/html"
 
-    # - name: Executing remote command
-    #   uses: appleboy/ssh-action@v1.1.0
-    #   with:
-    #     host: ${{ secrets.HOST }}
-    #     username: ${{ secrets.USERNAME }}
-    #     key: ${{ secrets.SSHKEY }}
-    #     port: ${{ secrets.PORT }}
-    # - name: aux
-    #   working-directory: ./var/www/apieleicoes.projectdev.services/html
-    #   run: pm2 restart app
-
+    - name: EXECUTING_REMOTE_COMMAND
+      uses: appleboy/ssh-action@v1.1.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSHKEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /var/www/apieleicoes.projectdev.services/html
+          /root/.local/share/fnm/node-versions/v22.11.0/installation/bin/pm2 restart app 
 
           
