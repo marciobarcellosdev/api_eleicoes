@@ -12,6 +12,7 @@ const mongoClient = require('mongodb').MongoClient;
 //const swaggerUI = require('swagger-ui-express');
 //const swaggerSpec = require('./swagger');
 const moment = require("moment");
+var enforce = require('express-sslify');
 
 const baseUrl = "mongodb://localhost:27017/";
 const base = "api_eleicoes";
@@ -196,6 +197,7 @@ app.post('/api/eleicao/importacoes-secoes', function (req, res) {
   })
 })
 
+app.use(enforce.HTTPS());
 
 app.listen(PORT, () => {
   console.log(`Express server running at http://localhost:${PORT}/`);
