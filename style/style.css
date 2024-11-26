@@ -1,0 +1,16 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  /* font-size: 20px; */
+}
+
+.Msg_Error {
+  text-decoration: none;
+  color:red;
+}
+
+.Msg_Success {
+  text-decoration: none;
+  color: green;
+}
