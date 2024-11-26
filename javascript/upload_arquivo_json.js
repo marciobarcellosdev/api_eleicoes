@@ -5,7 +5,7 @@ $(document).ready(function(e) {
     var formData = new FormData(this);
     formData.append("UploadArquivoJSON", arquivoJSON.files[0])
     
-    const host = "http://projectdev.services:3039/";
+    const host = "https://projectdev.services:3039/";
     //const host = "http://localhost:3039";
     
     let endPoint;
