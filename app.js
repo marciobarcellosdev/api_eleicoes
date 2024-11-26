@@ -197,7 +197,8 @@ app.post('/api/eleicao/importacoes-secoes', function (req, res) {
   })
 })
 
-app.use(enforce.HTTPS());
+//app.use(enforce.HTTPS()); // not work
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 
 app.listen(PORT, () => {
   console.log(`Express server running at http://localhost:${PORT}/`);
