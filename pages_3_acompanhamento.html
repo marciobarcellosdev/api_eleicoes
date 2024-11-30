@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <title>Acompanhamento da importação</title>
+</head>
+<body>
+
+  <form id="formConfig" method="GET" enctype="multipart/form-data">
+    <h1>ACOMPANHAMENTO - Importações</h1>
+    Filtro por zona: <input type="input" id="ParametroZona"><br><br>
+    Filtro por seção: <input type="input" id="ParametroSecao"><br><br>
+    <input type="submit" id="Coonsultar" value="Consultar"><br><br>
+    <div ><strong>Obs.:</strong> Se não tiver filtros preenchidos todos os dados serão mostrados.</div><br>
+    </form>
+
+    <br><br>
+    <div id="www">Resultado da consulta:</div><br>
+    <div class="Msg_Success" id="RetornoUploadMessage"></div>
+    <div id="RetornoUploadArquivo"></div>
+    <div class="Msg_Error" id="RetornoUploadError"></div>
+
+    <div id="plot1" style="width:600px;height:250px;"></div>
+    <div id="plot2" style="width:600px;height:250px;"></div>
+
+    <script src="javascript/cfg.js"></script>
+    <script src="javascript/consulta_1_importacoes.js"></script>
+</body>
+</html>

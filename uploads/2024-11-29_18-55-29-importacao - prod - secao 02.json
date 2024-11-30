@@ -1,0 +1,15 @@
+{
+  "idSecao": "02",
+  "quantidadePresentes": 30,
+  "votosValidos": 35,
+  "candidatos": [
+    {
+      "nomeCandidato": "CandidatoUm",
+      "quantidadeVotos": 10
+    },
+	{
+      "nomeCandidato": "CandidatoDois",
+      "quantidadeVotos": 20
+    }
+  ]
+}

@@ -5,9 +5,6 @@ $(document).ready(function(e) {
     var formData = new FormData(this);
     formData.append("UploadArquivoJSON", arquivoJSON.files[0])
     
-    const host = "https://projectdev.services:3039";
-    //const host = "http://localhost:3039";
-    
     let endPoint;
     const endPointConfig = "/api/eleicao";
     const endPointImportacao = "/api/eleicao/importacoes-secoes";

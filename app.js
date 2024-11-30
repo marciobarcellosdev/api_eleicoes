@@ -1,20 +1,18 @@
 
-//https://blog.postman.com/how-to-create-a-rest-api-with-node-js-and-express/
-//https://runjs.app/blog/how-to-start-a-node-server
-
 const cors = require('cors');
 const express = require('express');
-const fs = require('fs');
-const mongoose = require("mongoose");
+const moment = require("moment");
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const mongoClient = require('mongodb').MongoClient;
+const mongoose = require("mongoose");
 //const swaggerUI = require('swagger-ui-express');
 //const swaggerSpec = require('./swagger');
-const moment = require("moment");
-var enforce = require('express-sslify');
+//var enforce = require('express-sslify');
 
-const baseUrl = "mongodb://localhost:27017/";
+//const baseUrl = "mongodb://localhost:27017/";
+const baseUrl = "mongodb+srv://marcbrcx:26okhnZFtXECgiEW@api-eleicoes.krf2w.mongodb.net/?retryWrites=true&w=majority&appName=api-eleicoes";
 const base = "api_eleicoes";
 const baseUrlDb = baseUrl + base;
 const baseCollectionConfig = "eleicoes_config";
@@ -29,10 +27,7 @@ const PORT = 3039;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /cors
 //https://medium.com/@highlanderfullstack/um-guia-para-cors-em-node-js-com-express-b576c71c50ea
-app.use(cors({
-  origin: '*'
-}));
-
+app.use(cors({origin: '*'}));
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /swagger
 //app.use('/swagger', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
@@ -66,15 +61,10 @@ const upload = multer({
 });
 
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /
-app.get("/", (req, res) => {
-  res.send("...");
-});
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /status
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /status [GET]
 app.get("/status", (req, res) => {
   const status = {
-    "Server status": "Running",
+    "Server status": "Running yes",
     // "server.requestTimeout": app.requestTimeout,
     // "server.headersTimeout": app.headersTimeout,
     // "server.keepAliveTimeout" : app.keepAliveTimeout,
@@ -83,7 +73,7 @@ app.get("/status", (req, res) => {
   res.send(status);
 });
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /statusdb
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /statusdb [GET]
 app.get("/statusdb", (req, res) => {
   mongoose.connect(baseUrlDb, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => res.send("Conectou no banco de dados"))
@@ -91,45 +81,106 @@ app.get("/statusdb", (req, res) => {
   //mongoose.disconnect();
 });
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /find -- PENDING
-// app.get("/find", (req, res) => {
-//   mongoClient.connect(baseUrl).then((client) => {
-//     const connect = client.db(base);
-//     const collection = connect.collection(baseCollection);
-
-//     async function find() {
-//       const result = await collection.find();
-//       res.send(result);
-//       //console.log('Found document:', result);
-//     }
-//     find();
-//     //let resultQuery = collection.find({}).toArray();
-//   }).catch(err => {
-//     res.send(err.Message);
-//   });
-// });
-
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/eleicoes_config/findOne
-// https://www.mongodb.com/pt-br/docs/manual/reference/method/db.collection.insertOne/
-app.get("/collection/" + baseCollectionConfig + "/findOne", (req, res) => {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/find/eleicoes_config [GET]
+app.get("/collection/find/eleicoes_config", (req, res) => {
+  console.log('res.query: ' + JSON.stringify(req.query));
+  
   mongoClient.connect(baseUrl).then((client) => {
     const connect = client.db(base);
-    const collection = connect.collection(baseCollection);
-    const nameTmp = req.query.name;
+    const collection = connect.collection(baseCollectionConfig);
+    const filtroTmp = req.query.nomeeleicao;
     
-    async function findOne(_name) {
-      const query = { name: _name };
-      const result = await collection.findOne(query);
-      res.send(result);
+    async function find(_filtro) {
+      const query = { nomeEleicao: _filtro };
+      let cursor;
+
+      if(filtroTmp == '' || !res.query){
+        cursor = await collection.find();
+      }else{
+        cursor = await collection.find(query);
+      }
+
+      const documentos = await cursor.toArray();
+      res.send(documentos);
     }
-    findOne(nameTmp);
+    find(filtroTmp);
+
   }).catch(err => {
     res.send(err.Message);
   });
 });
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/find/eleicoes_importacao [GET]
+app.get("/collection/find/eleicoes_importacao", (req, res) => {
+  console.log('res.query: ' + JSON.stringify(req.query));
+  
+  mongoClient.connect(baseUrl).then((client) => {
+    const connect = client.db(base);
+    const collection = connect.collection(baseCollectionImportacao);
+    const filtroTmp = req.query.idsecao;
+    
+    async function find(_filtro) {
+      const query = { idSecao: _filtro };
+      let cursor;
+
+      if(filtroTmp == '' || !res.query){
+        cursor = await collection.find();
+      }else{
+        cursor = await collection.find(query);
+      }
+
+      const documentos = await cursor.toArray();
+      res.send(documentos);
+    }
+    find(filtroTmp);
+
+  }).catch(err => {
+    res.send(err.Message);
+  });
+});
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/findOne/eleicoes_config [GET]
+//app.get("/collection/" + baseCollectionConfig + "/findOne", (req, res) => {
+app.get("/collection/findOne/eleicoes_config", (req, res) => {
+  console.log('res.query: ' + JSON.stringify(req.query));
+
+  mongoClient.connect(baseUrl).then((client) => {
+    const connect = client.db(base);
+    const collection = connect.collection(baseCollectionConfig);
+    const nomeeleicaoTmp = req.query.nomeeleicao;
+    
+    async function findOne(_nomeeleicao) {
+      const query = { nomeEleicao: _nomeeleicao };
+      const result = await collection.findOne(query);
+      res.send(result);
+    }
+    findOne(nomeeleicaoTmp);
+  }).catch(err => {
+    res.send(err.Message);
+  });
+});
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/findOne/eleicoes_importacao [GET]
+app.get("/collection/findOne/eleicoes_importacao", (req, res) => {
+  console.log('res.query: ' + JSON.stringify(req.query));
+
+  mongoClient.connect(baseUrl).then((client) => {
+    const connect = client.db(base);
+    const collection = connect.collection(baseCollectionImportacao);
+    const idsecaoTmp = req.query.idsecao;
+    
+    async function findOne(_idsecao) {
+      const query = { idSecao: _idsecao };
+      const result = await collection.findOne(query);
+      res.send(result);
+    }
+    findOne(idsecaoTmp);
+  }).catch(err => {
+    res.send(err.Message);
+  });
+});
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao [POST]
 app.post('/api/eleicao', function (req, res) {
   const uploadTmp = upload.single('UploadArquivoJSON');
   uploadTmp(req, res, function (err) {
@@ -163,7 +214,13 @@ app.post('/api/eleicao', function (req, res) {
   })
 })
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/importacoes-secoes
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/resultados [GET]
+app.get('/api/eleicao/resultados', function (req, res) {
+  
+})
+
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/importacoes-secoes [POST]
 app.post('/api/eleicao/importacoes-secoes', function (req, res) {
   const uploadTmp = upload.single('UploadArquivoJSON');
   uploadTmp(req, res, function (err) {
@@ -197,8 +254,158 @@ app.post('/api/eleicao/importacoes-secoes', function (req, res) {
   })
 })
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/importacoes-secoes [GET]
+app.get("/api/eleicao/importacoes-secoes", (req, res) => {
+  // console.log('res.query: ' + JSON.stringify(req.query));
+  //console.log('res.headers s: ' + JSON.stringify(req.headers));
+  console.log('req.headers.parametrozona: ' + req.headers.parametrozona);
+  console.log('req.headers.parametrosecao: ' + req.headers.parametrosecao);
+
+  mongoClient.connect(baseUrl).then((client) => {
+    const connect = client.db(base);
+    const colConfig = connect.collection(baseCollectionConfig);
+    const colImportacao = connect.collection(baseCollectionImportacao);
+    const filtroZona = req.headers.parametrozona;
+    const filtroSecao = req.headers.parametrosecao;
+
+    console.log('filtroZona: ' + filtroZona);
+    console.log('filtroSecao: ' + filtroSecao);
+    
+    async function find(_filtroZona, _filtroSecao) {
+      let queryConfig;
+      let queryImportacao;
+
+
+      if(_filtroSecao == '' || _filtroSecao === undefined){
+        queryImportacao = {  };
+        console.log('sem conteudo');
+      }else{
+        queryImportacao = { 'conteudoArquivo.idSecao': _filtroSecao };
+        console.log('com conteudo');
+      }
+
+      if(_filtroZona == '' || _filtroZona === undefined){
+        queryConfig = {  };
+        console.log('sem conteudo');
+      }else{
+        queryConfig = { 'conteudoArquivo.idSecao': _filtroZona };
+        console.log('com conteudo');
+      }
+
+
+
+      let findConfig;
+      let findImportacao;
+
+      findConfig = await colConfig.find({}, {});
+      findImportacao = await colImportacao.find(queryImportacao, {});
+
+      const cursorConfig = await findConfig.toArray();
+      const cursorImportacao = await findImportacao.toArray();
+      
+      var objConfig = JSON.parse(JSON.stringify(cursorConfig[0]));
+      var objImportacao = JSON.parse(JSON.stringify(cursorImportacao));
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - totalSecoes
+      function getTotalSecoes() {
+        var count = 0;
+        objConfig.conteudoArquivo.zonasEleitorais.forEach((z) => {
+          z.secoes.forEach((s) => {
+            count++;
+          });
+        });
+        return count;
+      }
+      var totalSecoes = getTotalSecoes();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - secoesImportadas
+      function getSecoesImportadas() {
+        var count = 0;
+        objImportacao.forEach((o) => {
+          count++;
+        });
+        return count;
+      }
+      var secoesImportadas = getSecoesImportadas();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - totalEleitoresPresentes
+      function getTotalEleitoresPresentes() {
+        var count = 0;
+        objImportacao.forEach((o) => {
+          count += o.conteudoArquivo.quantidadePresentes;
+        });
+        return count;
+      }
+      var totalEleitoresPresentes = getTotalEleitoresPresentes();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - percentualPresentes
+      function getPercentualPresentes() {
+        var countQtd = 0;
+        var countVotos = 0;
+        var percentual = 0;
+        objImportacao.forEach((o) => {
+          countQtd += o.conteudoArquivo.quantidadePresentes;
+          countVotos += o.conteudoArquivo.votosValidos;
+        });
+        percentual = (countQtd/countVotos) * 100;
+        return percentual.toFixed(2);
+      }
+      var percentualPresentes = getPercentualPresentes();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - totalAbstencoes
+      function getTotalAbstencoes() {
+        var countQtd = 0;
+        var countVotos = 0;
+        objImportacao.forEach((o) => {
+          countQtd += o.conteudoArquivo.quantidadePresentes;
+          countVotos += o.conteudoArquivo.votosValidos;
+        });
+
+        return countVotos - countQtd;
+      }
+      var totalAbstencoes = getTotalAbstencoes();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - percentualAbstencoes **
+      function getPercentualAbstencoes() {
+        var countQtd = 0;
+        var countVotos = 0;
+        var countAbstencoes = 0;
+        var percentual = 0;
+        objImportacao.forEach((o) => {
+          countQtd += o.conteudoArquivo.quantidadePresentes;
+          countVotos += o.conteudoArquivo.votosValidos;
+        });
+        countAbstencoes = countVotos - countQtd;
+        percentual = (countAbstencoes/countVotos) * 100;
+        return percentual.toFixed(2);
+      }
+      var percentualAbstencoes = getPercentualAbstencoes();
+      
+
+
+      const jsonRetorno = [
+      {
+        "totalSecoes": totalSecoes,
+        "secoesImportadas": secoesImportadas,
+        "totalEleitoresPresentes": totalEleitoresPresentes,
+        "percentualPresentes": percentualPresentes,
+        "totalAbstencoes": totalAbstencoes,
+        "percentualAbstencoes": percentualAbstencoes
+      }];
+      
+      res.send(jsonRetorno);
+      //res.json({ msgSucesso: jsonRetorno });
+    }
+    find(filtroZona, filtroSecao);
+
+  }).catch(err => {
+    res.send(err.Message);
+  });
+});
+
+
 //app.use(enforce.HTTPS()); // not work
-app.use(enforce.HTTPS({ trustProtoHeader: true }));
+//app.use(enforce.HTTPS({ trustProtoHeader: true }));
 
 app.listen(PORT, () => {
   console.log(`Express server running at http://localhost:${PORT}/`);
@@ -206,54 +413,29 @@ app.listen(PORT, () => {
 
 
 
-// mongoClient.connect(baseUrl).then((client) => {
-//   const connect = client.db(base);
-//   const collection = connect.collection(baseCollection);
-//   collection.insertOne({ 
-//       "name": "aayush", "class": "GFG" });
-//   collection.insertMany([
-//       { "name": "saini", "class": "GFG" }, 
-//       { "name": "GfGnew", "class": "GFGNEW" }
-//   ]);
-//   console.log("Insertion Successful")
-// }).catch(err => {
-//   // If error occurred show the error message
-//   console.log(err.Message);
+
+// BKP NÃO REMOVER
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/eleicoes_config/findOne
+// https://www.mongodb.com/pt-br/docs/manual/reference/method/db.collection.insertOne/
+// app.get("/collection/" + baseCollectionConfig + "/findOne", (req, res) => {
+  
+//   console.log('res.query: ' + JSON.stringify(req.query));
+//   //console.log('res.headers s: ' + JSON.stringify(req.headers));
+
+//   mongoClient.connect(baseUrl).then((client) => {
+//     const connect = client.db(base);
+//     const collection = connect.collection(baseCollectionConfig);
+//     const nameTmp = req.query.nomeeleicao;
+    
+//     async function findOne(_name) {
+//       const query = { nomeEleicao: _name };
+//       const result = await collection.findOne(query);
+//       res.send(result);
+//     }
+//     findOne(nameTmp);
+//   }).catch(err => {
+//     res.send(err.Message);
+//   });
 // });
 
-// if(err.code === 'LIMIT_FILE_SIZE'){
-//   console.error('é o erro de limite');
-// }
-
-// let rawdata = fs.readFileSync(req.file);
-// let punishments = JSON.parse(rawdata);
-//console.log(punishments);
-
-///api/eleicao
-
-// collection.insertOne({ 
-//     "nomeEleicao": "Para presidente", 
-//     "candidatos": ["Candidato Um", "Candidato Dois"],
-//     "zonasEleitorais": 
-//     [
-//       {"idZona" : "169", 
-//        "secoes" : 
-//        [
-//           {"idSecao": "01", 
-//            "quantidadeEleitores" : 39}
-//       ]}
-//     ]
-// });
-
-///api/eleicao/importacoes-secoes
-
-// collection.insertOne({ 
-//     "idSecao": "01", 
-//     "quantidadePresentes": 2,
-//     "votosValidos": 36,
-//     "candidatos": 
-//     [
-//       {"nomeCandidato": "Candidato Um",
-//       "quantidadeVotos": 20}
-//     ]
-// });

@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="style/style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <title>Importação de resultados</title>
+  <title>Configuração da eleição</title>
 </head>
 <body>
-  <p id="valida-endpoint" name="apieleicaoimportacoessecoes" style="display: none;"></p>
+  <p id="valida-endpoint" name="apieleicao" style="display: none;"></p>
 
   <form id="formConfig" method="POST" enctype="multipart/form-data">
-    <h1>IMPORTAÇÃO - Enviar arquivo</h1>
+    <h1>CONFIGURAÇÃO - Enviar arquivo</h1>
     <input type="file" class="zzzzbtn-upload" id="UploadArquivoJSON"><br><br>
     <input type="submit" class="zzzzzbtn-upload" id="EnviarJSON" value="Enviar"><br><br>
     <div class="zzzzz"><strong>Extensão suportada:</strong> .json</div><br>
@@ -23,6 +23,7 @@
     <div id="RetornoUploadArquivo"></div>
     <div class="Msg_Error" id="RetornoUploadError"></div>
 
-    <script src="javascript/upload_arquivo_json.js"></script>
+    <script src="javascript/cfg.js"></script>
+    <script src="javascript/upload.js"></script>
 </body>
 </html>
