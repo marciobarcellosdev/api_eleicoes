@@ -20,10 +20,10 @@ const baseCollectionImportacao = "eleicoes_importacao";
 
 const app = express();
 const PORT = 3039;
-// app.requestTimeout = 5000;
-// app.headersTimeout = 4000;
-// app.keepAliveTimeout = 3000;
-// app.timeout = 3000;
+app.requestTimeout = 21000;
+app.headersTimeout = 21000;
+app.keepAliveTimeout = 21000;
+app.timeout = 21000;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /cors
 //https://medium.com/@highlanderfullstack/um-guia-para-cors-em-node-js-com-express-b576c71c50ea
