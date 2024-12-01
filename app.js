@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 //var enforce = require('express-sslify');
 
 //const baseUrl = "mongodb://localhost:27017/";
-const baseUrl = "mongodb+srv://marcbrcx:26okhnZFtXECgiEW@api-eleicoes.krf2w.mongodb.net/?retryWrites=true&w=majority&appName=api-eleicoes";
+const baseUrl = "mongodb+srv://steamadd1:0MMqgGjRNOtO9gsr@cluster0.jt4zn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const base = "api_eleicoes";
 const baseUrlDb = baseUrl + base;
 const baseCollectionConfig = "eleicoes_config";
