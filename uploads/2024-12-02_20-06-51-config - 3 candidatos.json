@@ -1,0 +1,45 @@
+{
+  "nomeEleicao": "Para presidente",
+  "candidatos": ["CandidadoUm", "CandidatoDois", "CandidatoTres"],
+  "zonasEleitorais": [
+    {
+      "idZona": "168",
+      "secoes": [
+        {
+          "idSecao": "01",
+          "quantidadeEleitores": 25
+        },
+		{
+          "idSecao": "02",
+          "quantidadeEleitores": 25
+        }
+      ]
+    },
+	{
+      "idZona": "321",
+      "secoes": [
+        {
+          "idSecao": "33",
+          "quantidadeEleitores": 100
+        },
+		{
+          "idSecao": "55",
+          "quantidadeEleitores": 100
+        }
+      ]
+    },
+	{
+      "idZona": "455",
+      "secoes": [
+        {
+          "idSecao": "59",
+          "quantidadeEleitores": 120
+        },
+		{
+          "idSecao": "77",
+          "quantidadeEleitores": 140
+        }
+      ]
+    }
+  ]
+}

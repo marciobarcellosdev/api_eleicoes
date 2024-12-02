@@ -18,15 +18,16 @@ $(document).ready(function(e) {
       return tmpFetch;
     };
     var resultPromise = await request('PromiseResult');
-
-    //console.log('resultPromise: ' + JSON.stringify(resultPromise));
-    //console.log('resultPromise: ' + resultPromise);
     
     $('#RetornoUploadMessage').text('');
     $('#RetornoUploadError').text('');
     $('#RetornoUploadArquivo').text('');
 
     if(resultPromise != null){
+
+      var graficoCandidatoNome = new Array();
+      var graficoCandidatoVotos = new Array();
+
       var doc = resultPromise[0];
       $('#RetornoUploadArquivo').append('Total votos válidos: ' + doc.totalVotosValidos + '<br>');
       $('#RetornoUploadArquivo').append('Percentual votos válidos: ' + doc.percentualVotosValidos + '<br>');
@@ -34,15 +35,16 @@ $(document).ready(function(e) {
       doc.candidatos.forEach((c) => {
         $('#RetornoUploadArquivo').append('Nome candidato: ' + c.nomeCandidato + '<br>');
         $('#RetornoUploadArquivo').append('Quantidade votos: ' + c.quantidadeVotos + '<br>');
-        $('#RetornoUploadArquivo').append('Percentual votos: 33.33 <br>');
-        //$('#RetornoUploadArquivo').append('Percentual votos: ' + c.percentualVotosValidos + '<br>');
+        $('#RetornoUploadArquivo').append('Percentual votos: ' + c.percentualVotos + ' %<br>');
         $('#RetornoUploadArquivo').append('<br>');
+
+        graficoCandidatoNome.push(c.nomeCandidato);
+        graficoCandidatoVotos.push(c.quantidadeVotos);
       });
 
-
       var data = [{
-          values: [doc.totalEleitoresPresentes, doc.totalAbstencoes],
-          labels: ['Presentes', 'Abstenções'], 
+          values: graficoCandidatoVotos,
+          labels: graficoCandidatoNome, 
           type: 'pie', 
           marker: { colors: ['rgb(50,205,50)', 'rgb(255,0,0)']}
           }];
@@ -50,7 +52,6 @@ $(document).ready(function(e) {
       Plotly.newPlot('plot1', data, layout);
 
     }// if
-
   });
 });
 

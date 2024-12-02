@@ -215,8 +215,8 @@ app.get('/api/eleicao/resultados', function (req, res) {
     const filtroZona = req.headers.parametrozona;
     const filtroSecao = req.headers.parametrosecao;
 
-    console.log('filtroZona: ' + filtroZona);
-    console.log('filtroSecao: ' + filtroSecao);
+    // console.log('filtroZona: ' + filtroZona);
+    // console.log('filtroSecao: ' + filtroSecao);
     
     async function find(_filtroZona, _filtroSecao) {
       let queryConfig;
@@ -259,21 +259,24 @@ app.get('/api/eleicao/resultados', function (req, res) {
       }
       var totalVotosValidos = getTotalVotosValidosEPercentualVotosValidos();
 
-
       // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - candidatos votos e percentual
       function getCandidatosVotosEPercentual() {
         var percentual = 0;
         var objResult = new Array();
+        var totalVotosTmp = 0;
 
         objImportacao.forEach((q) => {
           q.conteudoArquivo.candidatos.forEach((votos) => {
             var obj = new Object();
+            var votosTmp = votos.quantidadeVotos;
+
+            totalVotosTmp += votosTmp;
 
             obj.NomeCandidato = votos.nomeCandidato;
             obj.QtdVotos = votos.quantidadeVotos;
+            obj.PercentualVotos = 0;
 
             let index = objResult.findIndex(i => i.NomeCandidato === obj.NomeCandidato);
-            
             if (index === -1) {
               objResult.push(obj);
             } else{
@@ -282,7 +285,10 @@ app.get('/api/eleicao/resultados', function (req, res) {
           });
         });
 
-        //percentual = (countVotos/countQtd) * 100;
+        objResult.forEach((o) => {
+          var percentualTmp = (o.QtdVotos/totalVotosTmp) * 100;
+          o.PercentualVotos = percentualTmp.toFixed(2);
+        });
         return objResult;
       }
       var candidatosVotosEPercentual = getCandidatosVotosEPercentual();
@@ -290,7 +296,7 @@ app.get('/api/eleicao/resultados', function (req, res) {
       // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON retorno
       var jsonCandidatos = new Array();
       candidatosVotosEPercentual.forEach((c) => {
-        jsonCandidatos.push({'nomeCandidato': c.NomeCandidato, 'quantidadeVotos': c.QtdVotos, 'percentualVotos': 33.33});
+        jsonCandidatos.push({'nomeCandidato': c.NomeCandidato, 'quantidadeVotos': c.QtdVotos, 'percentualVotos': c.PercentualVotos});
       });
 
       const jsonRetorno = [
