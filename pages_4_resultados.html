@@ -5,7 +5,6 @@
   <link rel="stylesheet" href="style/style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <title>Acompanhamento do resultado</title>
 </head>
 <body>
@@ -25,106 +24,8 @@
   <div class="Msg_Error" id="RetornoUploadError"></div>
 
   <div id="plot1" style="width:600px;height:250px;"></div>
-  <div id="plot2" style="width:600px;height:250px;"></div>
-  <div id="apex1" style="width:600px;height:250px;"></div>
-  <div id="apex2" style="width:600px;height:250px;"></div>
-
-  <script>
-    //https://plotly.com/javascript/pie-charts/
-    TESTER = document.getElementById('plot1');
-    Plotly.newPlot( TESTER, [{
-    x: [1, 2, 3, 4, 5],
-    y: [1, 2, 4, 8, 16] }], {
-    margin: { t: 0 } } );
-
-    var data = [{
-        values: [19, 26, 55],
-        labels: ['Residential', 'Non-Residential', 'Utility'],
-        type: 'pie'
-        }];
-
-        var layout = {
-        height: 400,
-        width: 500
-    };
-    Plotly.newPlot('plot2', data, layout);
-  </script>
-
-  <script>
-    //https://apexcharts.com/javascript-chart-demos/column-charts/stacked-column-100/
-    var options1 = {
-      series: [44, 55, 13, 43, 22],
-      chart: {
-      width: 380,
-      type: 'pie',
-    },
-    labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
-        },
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }]
-    };
-
-    var chart1 = new ApexCharts(document.querySelector("#apex1"), options1);
-    chart1.render();
-
-    // OUTRO GRAFICO
-    var options2 = {
-      series: [{
-      name: 'PRODUCT A',
-      data: [44, 55, 41, 67, 22, 43, 21, 49]
-    }, {
-      name: 'PRODUCT B',
-      data: [13, 23, 20, 8, 13, 27, 33, 12]
-    }, {
-      name: 'PRODUCT C',
-      data: [11, 17, 15, 15, 21, 14, 15, 13]
-    }],
-      chart: {
-      type: 'bar',
-      height: 350,
-      stacked: true,
-      stackType: '100%'
-    },
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        legend: {
-          position: 'bottom',
-          offsetX: -10,
-          offsetY: 0
-        }
-      }
-    }],
-    xaxis: {
-      categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2',
-        '2012 Q3', '2012 Q4'
-      ],
-    },
-    fill: {
-      opacity: 1
-    },
-    legend: {
-      position: 'right',
-      offsetX: 0,
-      offsetY: 50
-    },
-    };
-
-    var chart2 = new ApexCharts(document.querySelector("#apex2"), options2);
-    chart2.render();
-    
-  </script>
-
 
   <script src="javascript/cfg.js"></script>
-  <script src="javascript/consulta_2_importacoes.js"></script>
+  <script src="javascript/consulta_2_resultados.js"></script>
 </body>
 </html>

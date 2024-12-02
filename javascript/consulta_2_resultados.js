@@ -7,8 +7,8 @@ $(document).ready(function(e) {
     formData.append("ParametroZona", filtroZona)
     formData.append("ParametroSecao", filtroSecao)
     
-    const endPointImportacao = "/api/eleicao/importacoes-secoes";
-    const url = host + endPointImportacao;
+    const endPointResultados = "/api/eleicao/resultados";
+    const url = host + endPointResultados;
     const requestOptions = {method: 'GET', headers: {'ParametroZona': filtroZona, 'ParametroSecao': filtroSecao}};
 
     var request = async () => {
@@ -28,14 +28,17 @@ $(document).ready(function(e) {
 
     if(resultPromise != null){
       var doc = resultPromise[0];
-      $('#RetornoUploadArquivo').append('Total seções: ' + doc.totalSecoes + '<br>');
-      $('#RetornoUploadArquivo').append('Seções importadas: ' + doc.secoesImportadas + '<br>');
+      $('#RetornoUploadArquivo').append('Total votos válidos: ' + doc.totalVotosValidos + '<br>');
+      $('#RetornoUploadArquivo').append('Percentual votos válidos: ' + doc.percentualVotosValidos + '<br>');
       $('#RetornoUploadArquivo').append('<br>');
-      $('#RetornoUploadArquivo').append('Total eleitores presentes: ' + doc.totalEleitoresPresentes + '<br>');
-      $('#RetornoUploadArquivo').append('Percentual presentes: ' + doc.percentualPresentes + ' %<br>');
-      $('#RetornoUploadArquivo').append('<br>');
-      $('#RetornoUploadArquivo').append('Total abstenções: ' + doc.totalAbstencoes + '<br>');
-      $('#RetornoUploadArquivo').append('Percentual abstenções: ' + doc.percentualAbstencoes + ' %<br>');
+      doc.candidatos.forEach((c) => {
+        $('#RetornoUploadArquivo').append('Nome candidato: ' + c.nomeCandidato + '<br>');
+        $('#RetornoUploadArquivo').append('Quantidade votos: ' + c.quantidadeVotos + '<br>');
+        $('#RetornoUploadArquivo').append('Percentual votos: 33.33 <br>');
+        //$('#RetornoUploadArquivo').append('Percentual votos: ' + c.percentualVotosValidos + '<br>');
+        $('#RetornoUploadArquivo').append('<br>');
+      });
+
 
       var data = [{
           values: [doc.totalEleitoresPresentes, doc.totalAbstencoes],

@@ -20,10 +20,6 @@ const baseCollectionImportacao = "eleicoes_importacao";
 
 const app = express();
 const PORT = 3039;
-// app.requestTimeout = 21000;
-// app.headersTimeout = 21000;
-// app.keepAliveTimeout = 21000;
-// app.timeout = 21000;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /cors
 //https://medium.com/@highlanderfullstack/um-guia-para-cors-em-node-js-com-express-b576c71c50ea
@@ -44,7 +40,8 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const filetypes = /.gif|.json/
+  //const filetypes = /.gif|.json/
+  const filetypes = /.json/
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
   if (extname) {
     return cb(null, true);
@@ -65,10 +62,6 @@ const upload = multer({
 app.get("/status", (req, res) => {
   const status = {
     "ServerStatus": "Running yes",
-    // "server.requestTimeout": app.requestTimeout,
-    // "server.headersTimeout": app.headersTimeout,
-    // "server.keepAliveTimeout" : app.keepAliveTimeout,
-    // "server.timeout" : app.timeout
   }
   res.send(status);
 });
@@ -83,7 +76,6 @@ app.get("/statusdb", (req, res) => {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/find/eleicoes_config [GET]
 app.get("/collection/find/eleicoes_config", (req, res) => {
-  console.log('res.query: ' + JSON.stringify(req.query));
   
   mongoClient.connect(baseUrl).then((client) => {
     const connect = client.db(base);
@@ -112,7 +104,6 @@ app.get("/collection/find/eleicoes_config", (req, res) => {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/find/eleicoes_importacao [GET]
 app.get("/collection/find/eleicoes_importacao", (req, res) => {
-  console.log('res.query: ' + JSON.stringify(req.query));
   
   mongoClient.connect(baseUrl).then((client) => {
     const connect = client.db(base);
@@ -140,9 +131,7 @@ app.get("/collection/find/eleicoes_importacao", (req, res) => {
 });
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/findOne/eleicoes_config [GET]
-//app.get("/collection/" + baseCollectionConfig + "/findOne", (req, res) => {
 app.get("/collection/findOne/eleicoes_config", (req, res) => {
-  console.log('res.query: ' + JSON.stringify(req.query));
 
   mongoClient.connect(baseUrl).then((client) => {
     const connect = client.db(base);
@@ -185,7 +174,7 @@ app.post('/api/eleicao', function (req, res) {
   const uploadTmp = upload.single('UploadArquivoJSON');
   uploadTmp(req, res, function (err) {
 
-    req.socket.setTimeout(5 * 60 * 1000);
+    //req.socket.setTimeout(5 * 60 * 1000);
 
     if (err instanceof multer.MulterError) {
       return res.status(400).json({ msgErro: err.message });
@@ -198,7 +187,6 @@ app.post('/api/eleicao', function (req, res) {
     }else{
       var rawdata = fs.readFileSync(req.file.path);
       var conteudoArquivo = JSON.parse(rawdata);
-      //console.log(punishments);
 
       mongoClient.connect(baseUrl).then((client) => {
         const connect = client.db(base);
@@ -216,16 +204,116 @@ app.post('/api/eleicao', function (req, res) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/resultados [GET]
 app.get('/api/eleicao/resultados', function (req, res) {
-  
-})
+  //console.log('res.headers s: ' + JSON.stringify(req.headers));
+  // console.log('req.headers.parametrozona: ' + req.headers.parametrozona);
+  // console.log('req.headers.parametrosecao: ' + req.headers.parametrosecao);
 
+  mongoClient.connect(baseUrl).then((client) => {
+    const connect = client.db(base);
+    const colConfig = connect.collection(baseCollectionConfig);
+    const colImportacao = connect.collection(baseCollectionImportacao);
+    const filtroZona = req.headers.parametrozona;
+    const filtroSecao = req.headers.parametrosecao;
+
+    console.log('filtroZona: ' + filtroZona);
+    console.log('filtroSecao: ' + filtroSecao);
+    
+    async function find(_filtroZona, _filtroSecao) {
+      let queryConfig;
+      let queryImportacao;
+
+      queryImportacao = _filtroSecao == '' || _filtroSecao === undefined ? queryImportacao = {  } : queryImportacao = { 'conteudoArquivo.idSecao': _filtroSecao };
+      queryConfig = _filtroZona == '' || _filtroZona === undefined ? queryConfig = {  } : queryConfig = { 'conteudoArquivo.idSecao': _filtroZona };
+
+      let findConfig;
+      let findImportacao;
+
+      findConfig = await colConfig.find({}, {});
+      findImportacao = await colImportacao.find(queryImportacao, {});
+
+      const cursorConfig = await findConfig.toArray();
+      const cursorImportacao = await findImportacao.toArray();
+      
+      var objConfig = JSON.parse(JSON.stringify(cursorConfig[0]));
+      var objImportacao = JSON.parse(JSON.stringify(cursorImportacao));
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - totalVotosValidos
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - percentualVotosValidos
+      function getTotalVotosValidosEPercentualVotosValidos() {
+        var countVotos = 0;
+        var countQtd = 0;
+        var percentual = 0;
+
+        objImportacao.forEach((o) => {
+          countVotos += o.conteudoArquivo.votosValidos;
+        });
+
+        objImportacao.forEach((q) => {
+          q.conteudoArquivo.candidatos.forEach((votos) => {
+            countQtd += votos.quantidadeVotos;
+          });
+        });
+
+        percentual = (countVotos/countQtd) * 100;
+        return new Array(countVotos, percentual.toFixed(2));
+      }
+      var totalVotosValidos = getTotalVotosValidosEPercentualVotosValidos();
+
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - candidatos votos e percentual
+      function getCandidatosVotosEPercentual() {
+        var percentual = 0;
+        var objResult = new Array();
+
+        objImportacao.forEach((q) => {
+          q.conteudoArquivo.candidatos.forEach((votos) => {
+            var obj = new Object();
+
+            obj.NomeCandidato = votos.nomeCandidato;
+            obj.QtdVotos = votos.quantidadeVotos;
+
+            let index = objResult.findIndex(i => i.NomeCandidato === obj.NomeCandidato);
+            
+            if (index === -1) {
+              objResult.push(obj);
+            } else{
+              objResult[index].QtdVotos += obj.QtdVotos;
+            }
+          });
+        });
+
+        //percentual = (countVotos/countQtd) * 100;
+        return objResult;
+      }
+      var candidatosVotosEPercentual = getCandidatosVotosEPercentual();
+
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON retorno
+      var jsonCandidatos = new Array();
+      candidatosVotosEPercentual.forEach((c) => {
+        jsonCandidatos.push({'nomeCandidato': c.NomeCandidato, 'quantidadeVotos': c.QtdVotos, 'percentualVotos': 33.33});
+      });
+
+      const jsonRetorno = [
+        {
+          "totalVotosValidos": totalVotosValidos[0],
+          "percentualVotosValidos": totalVotosValidos[1],
+          "candidatos": jsonCandidatos
+        }
+      ];
+      res.send(jsonRetorno);
+    }
+    find(filtroZona, filtroSecao);
+  }).catch(err => {
+    res.send(err.Message);
+  });
+})
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/importacoes-secoes [POST]
 app.post('/api/eleicao/importacoes-secoes', function (req, res) {
   const uploadTmp = upload.single('UploadArquivoJSON');
   uploadTmp(req, res, function (err) {
     
-    req.socket.setTimeout(5 * 60 * 1000);
+    //req.socket.setTimeout(5 * 60 * 1000);
 
     if (err instanceof multer.MulterError) {
       return res.status(400).json({ msgErro: err.message });
@@ -238,7 +326,6 @@ app.post('/api/eleicao/importacoes-secoes', function (req, res) {
     }else{
       var rawdata = fs.readFileSync(req.file.path);
       var conteudoArquivo = JSON.parse(rawdata);
-      //console.log(punishments);
   
       mongoClient.connect(baseUrl).then((client) => {
         const connect = client.db(base);
@@ -256,10 +343,6 @@ app.post('/api/eleicao/importacoes-secoes', function (req, res) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /api/eleicao/importacoes-secoes [GET]
 app.get("/api/eleicao/importacoes-secoes", (req, res) => {
-  // console.log('res.query: ' + JSON.stringify(req.query));
-  //console.log('res.headers s: ' + JSON.stringify(req.headers));
-  console.log('req.headers.parametrozona: ' + req.headers.parametrozona);
-  console.log('req.headers.parametrosecao: ' + req.headers.parametrosecao);
 
   mongoClient.connect(baseUrl).then((client) => {
     const connect = client.db(base);
@@ -268,30 +351,24 @@ app.get("/api/eleicao/importacoes-secoes", (req, res) => {
     const filtroZona = req.headers.parametrozona;
     const filtroSecao = req.headers.parametrosecao;
 
-    console.log('filtroZona: ' + filtroZona);
-    console.log('filtroSecao: ' + filtroSecao);
-    
     async function find(_filtroZona, _filtroSecao) {
       let queryConfig;
       let queryImportacao;
 
+      // if(_filtroSecao == '' || _filtroSecao === undefined){
+      //   queryImportacao = {  };
+      // }else{
+      //   queryImportacao = { 'conteudoArquivo.idSecao': _filtroSecao };
+      // }
 
-      if(_filtroSecao == '' || _filtroSecao === undefined){
-        queryImportacao = {  };
-        console.log('sem conteudo');
-      }else{
-        queryImportacao = { 'conteudoArquivo.idSecao': _filtroSecao };
-        console.log('com conteudo');
-      }
+      // if(_filtroZona == '' || _filtroZona === undefined){
+      //   queryConfig = {  };
+      // }else{
+      //   queryConfig = { 'conteudoArquivo.idSecao': _filtroZona };
+      // }
 
-      if(_filtroZona == '' || _filtroZona === undefined){
-        queryConfig = {  };
-        console.log('sem conteudo');
-      }else{
-        queryConfig = { 'conteudoArquivo.idSecao': _filtroZona };
-        console.log('com conteudo');
-      }
-
+      queryImportacao = _filtroSecao == '' || _filtroSecao === undefined ? queryImportacao = {  } : queryImportacao = { 'conteudoArquivo.idSecao': _filtroSecao };
+      queryConfig = _filtroZona == '' || _filtroZona === undefined ? queryConfig = {  } : queryConfig = { 'conteudoArquivo.idSecao': _filtroZona };
 
 
       let findConfig;
@@ -365,7 +442,7 @@ app.get("/api/eleicao/importacoes-secoes", (req, res) => {
       }
       var totalAbstencoes = getTotalAbstencoes();
 
-      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - percentualAbstencoes **
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON data - percentualAbstencoes
       function getPercentualAbstencoes() {
         var countQtd = 0;
         var countVotos = 0;
@@ -380,9 +457,8 @@ app.get("/api/eleicao/importacoes-secoes", (req, res) => {
         return percentual.toFixed(2);
       }
       var percentualAbstencoes = getPercentualAbstencoes();
-      
 
-
+      // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . JSON retorno
       const jsonRetorno = [
       {
         "totalSecoes": totalSecoes,
@@ -397,7 +473,6 @@ app.get("/api/eleicao/importacoes-secoes", (req, res) => {
       //res.json({ msgSucesso: jsonRetorno });
     }
     find(filtroZona, filtroSecao);
-
   }).catch(err => {
     res.send(err.Message);
   });
@@ -410,32 +485,3 @@ app.get("/api/eleicao/importacoes-secoes", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Express server running at http://localhost:${PORT}/`);
 });
-
-
-
-
-// BKP NÃO REMOVER
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /collection/eleicoes_config/findOne
-// https://www.mongodb.com/pt-br/docs/manual/reference/method/db.collection.insertOne/
-// app.get("/collection/" + baseCollectionConfig + "/findOne", (req, res) => {
-  
-//   console.log('res.query: ' + JSON.stringify(req.query));
-//   //console.log('res.headers s: ' + JSON.stringify(req.headers));
-
-//   mongoClient.connect(baseUrl).then((client) => {
-//     const connect = client.db(base);
-//     const collection = connect.collection(baseCollectionConfig);
-//     const nameTmp = req.query.nomeeleicao;
-    
-//     async function findOne(_name) {
-//       const query = { nomeEleicao: _name };
-//       const result = await collection.findOne(query);
-//       res.send(result);
-//     }
-//     findOne(nameTmp);
-//   }).catch(err => {
-//     res.send(err.Message);
-//   });
-// });
-
