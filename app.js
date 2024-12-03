@@ -61,7 +61,7 @@ const upload = multer({
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . /status [GET]
 app.get("/status", (req, res) => {
   const status = {
-    "ServerStatus": "Running yes",
+    "ServerStatus": "Running",
   }
   res.send(status);
 });
