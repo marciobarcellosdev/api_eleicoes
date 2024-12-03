@@ -1,19 +1,19 @@
 {
   "idSecao": "77",
-  "quantidadePresentes": 100,
-  "votosValidos": 25,
+  "quantidadePresentes": 30,
+  "votosValidos": 35,
   "candidatos": [
     {
       "nomeCandidato": "CandidatoUm",
-      "quantidadeVotos": 5
-    },
-	{
-      "nomeCandidato": "CandidatoDois",
       "quantidadeVotos": 15
     },
 	{
+      "nomeCandidato": "CandidatoDois",
+      "quantidadeVotos": 25
+    },
+	{
       "nomeCandidato": "CandidatoTres",
-      "quantidadeVotos": 80
+      "quantidadeVotos": 50
     }
   ]
 }
